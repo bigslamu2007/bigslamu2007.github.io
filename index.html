@@ -3,73 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Life App</title>
+    <title>Life OS</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
-        :root { --primary: #007AFF; --bg: #f2f2f7; --card: #ffffff; --text: #000000; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-        
-        .header { padding: 50px 20px 20px; background: var(--bg); font-size: 28px; font-weight: bold; }
-        
-        .content-area { height: calc(100vh - 160px); overflow-y: auto; padding: 0 20px; }
-        
-        .tab-content { display: none; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
-        
-        .goal-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
-        /* Bottom Nav */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding-top: 10px; border-top: 0.5px solid #d1d1d6; }
-        .nav-item { text-align: center; color: #8e8e93; font-size: 10px; flex: 1; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { display: block; font-size: 24px; margin-bottom: 4px; }
+        :root { 
+            --primary: #0A84FF; /* iOS Blue */
+            --bg: #000000; 
+            --card: #1C1C1E; 
+            --text: #FFFFFF; 
+            --secondary-text: #8E8E93;
+            --tab-bg: #161617;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            margin: 0; 
+            padding: 0; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* Top Tab Bar */
+        .nav-bar { 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            height: 60px; 
+            background: var(--tab-bg); 
+            display: flex; 
+            border-bottom: 0.5px solid #38383A;
+            z-index: 1000;
+            padding-top: env(safe-area-inset-top); /* Handles the iPhone Dynamic Island/Notch */
+        }
+
+        .nav-item { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--secondary-text); 
+            font-size: 12px; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active { 
+            color: var(--primary); 
+            border-bottom: 3px solid var(--primary);
+            background: rgba(10, 132, 255, 0.1);
+        }
+
+        /* Content Layout */
+        .content-area { 
+            margin-top: calc(70px + env(safe-area-inset-top)); 
+            height: calc(100vh - 100px); 
+            overflow-y: auto; 
+            padding: 0 15px; 
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.2s ease-in-out; }
+        .tab-content.active { display: block; }
+
+        .goal-card { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 14px; 
+            margin-bottom: 12px; 
+            border: 1px solid #2C2C2E;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value { color: var(--primary); font-weight: bold; font-family: monospace; font-size: 18px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="header" id="page-title">Daily Goals</div>
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="showTab('daily', this)">Daily</div>
+        <div class="nav-item" onclick="showTab('weekly', this)">Weekly</div>
+        <div class="nav-item" onclick="showTab('monthly', this)">Monthly</div>
+        <div class="nav-item" onclick="showTab('yearly', this)">Yearly</div>
+        <div class="nav-item" onclick="showTab('stats', this)">Stats</div>
+    </nav>
 
     <div class="content-area">
         <div id="daily" class="tab-content active">
-            <div class="goal-card">☀️ Drink 2L Water</div>
-            <div class="goal-card">🏃‍♂️ 30 min Walk</div>
+            <div class="goal-card">✅ Morning Meditation</div>
+            <div class="goal-card">💧 2L Water Intake</div>
+            <div class="goal-card">🏋️‍♂️ Push Workout</div>
         </div>
+
         <div id="weekly" class="tab-content">
-            <div class="goal-card">📚 Read 1 Book</div>
+            <div class="goal-card">📖 Finish 1st half of "Atomic Habits"</div>
+            <div class="goal-card">🍱 Meal Prep - Sunday</div>
         </div>
+
         <div id="monthly" class="tab-content">
-            <div class="goal-card">💰 Save $500</div>
+            <div class="goal-card">📈 Review Investment Portfolio</div>
+            <div class="goal-card">🧹 Deep Clean Apartment</div>
         </div>
+
         <div id="yearly" class="tab-content">
-            <div class="goal-card">✈️ Visit Japan</div>
+            <div class="goal-card">🌍 Travel to Tokyo</div>
+            <div class="goal-card">🎸 Learn 5 Full Songs on Guitar</div>
         </div>
+
         <div id="stats" class="tab-content">
-            <div class="goal-card"><b>Strength:</b> Level 15</div>
-            <div class="goal-card"><b>Focus:</b> Level 22</div>
+            <div class="goal-card"><div class="stat-row"><span>Strength</span> <span class="stat-value">LVL 12</span></div></div>
+            <div class="goal-card"><div class="stat-row"><span>Intelligence</span> <span class="stat-value">LVL 24</span></div></div>
+            <div class="goal-card"><div class="stat-row"><span>Charisma</span> <span class="stat-value">LVL 08</span></div></div>
         </div>
     </div>
 
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="showTab('daily', 'Daily Goals', this)">●<br>Daily</div>
-        <div class="nav-item" onclick="showTab('weekly', 'Weekly Goals', this)">●<br>Weekly</div>
-        <div class="nav-item" onclick="showTab('monthly', 'Monthly Goals', this)">●<br>Monthly</div>
-        <div class="nav-item" onclick="showTab('yearly', 'Yearly Goals', this)">●<br>Yearly</div>
-        <div class="nav-item" onclick="showTab('stats', 'Character Stats', this)">●<br>Stats</div>
-    </nav>
-
     <script>
-        function showTab(tabId, title, element) {
+        function showTab(tabId, element) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             
             // Show selected tab
             document.getElementById(tabId).classList.add('active');
-            document.getElementById('page-title').innerText = title;
             element.classList.add('active');
+            
+            // Subtle haptic feedback feel (vibration not supported in standard web, 
+            // but we can add a visual pop if you like!)
         }
     </script>
 </body>
