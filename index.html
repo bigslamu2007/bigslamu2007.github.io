@@ -34,12 +34,15 @@
         
         .input-group { margin-top: 12px; display: flex; gap: 8px; }
         input[type="number"] { background: #2C2C2E; border: none; border-radius: 8px; color: white; padding: 8px; width: 50px; text-align: center; font-size: 16px; }
-        button { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: 600; flex-grow: 1; font-size: 14px; outline: none; }
+        button { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: 600; flex-grow: 1; font-size: 14px; }
         
-        .reset-btn { background: var(--danger); margin-top: 20px; width: 100%; padding: 15px; }
+        .stat-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+        .stat-label { color: var(--secondary-text); font-size: 14px; }
+        .stat-total { color: var(--text); font-family: monospace; font-weight: bold; }
+
+        .full-reset-btn { background: var(--danger); margin-top: 30px; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; color: white; border: none; }
 
         .complete-status { color: var(--success); font-size: 11px; display: none; }
-        .stat-val { color: var(--primary); font-family: monospace; font-size: 20px; font-weight: bold; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -57,82 +60,130 @@
     <div class="content-area">
         <div id="daily" class="tab-content active">
             <div class="goal-card" id="card-pushups" data-goal="100">
-                <div class="tracker-header"><span>Do 100 Push-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="tracker-header"><span>Push-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('pushups')">Add</button></div>
             </div>
-
             <div class="goal-card" id="card-situps" data-goal="100">
-                <div class="tracker-header"><span>Do 100 Sit-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="tracker-header"><span>Sit-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('situps')">Add</button></div>
             </div>
-
             <div class="goal-card" id="card-squats" data-goal="100">
-                <div class="tracker-header"><span>Do 100 Squats</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="tracker-header"><span>Squats</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('squats')">Add</button></div>
             </div>
-
             <div class="goal-card" id="card-ammocan" data-goal="100">
-                <div class="tracker-header"><span>Do 100 Ammo Can Lifts</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="tracker-header"><span>Ammo Can Lifts</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('ammocan')">Add</button></div>
             </div>
-
             <div class="goal-card" id="card-pullups" data-goal="20">
-                <div class="tracker-header"><span>Do 20 Pull-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="tracker-header"><span>Pull-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/20</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('pullups')">Add</button></div>
             </div>
-
             <div class="goal-card" id="card-run" data-goal="3">
                 <div class="tracker-header"><span>Run 3 Miles</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container"><div class="count-display">0/3</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><button onclick="addReps('run', 1)">+1 Mile Complete</button></div>
             </div>
-
-            <button class="reset-btn" onclick="resetGoals()">Reset Daily Goals</button>
         </div>
 
-        <div id="stats" class="tab-content">
+        <div id="weekly" class="tab-content">
             <div class="goal-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>STRENGTH</span>
-                    <span id="strength-val" class="stat-val">0</span>
+                <div class="tracker-header">Daily Commission Complete</div>
+                <div class="progress-container">
+                    <div class="count-display" id="commission-count">0/5</div>
+                    <div class="progress-bar-bg"><div id="commission-fill" class="progress-bar-fill" style="background: var(--success)"></div></div>
                 </div>
             </div>
         </div>
 
-        <div id="weekly" class="tab-content"></div><div id="monthly" class="tab-content"></div><div id="yearly" class="tab-content"></div>
+        <div id="stats" class="tab-content">
+            <div class="goal-card">
+                <h3 style="margin-top:0">All-Time Stats</h3>
+                <div class="stat-line"><span class="stat-label">Push-Ups</span><span id="stat-pushups" class="stat-total">0</span></div>
+                <div class="stat-line"><span class="stat-label">Sit-Ups</span><span id="stat-situps" class="stat-total">0</span></div>
+                <div class="stat-line"><span class="stat-label">Squats</span><span id="stat-squats" class="stat-total">0</span></div>
+                <div class="stat-line"><span class="stat-label">Ammo Can Lifts</span><span id="stat-ammocan" class="stat-total">0</span></div>
+                <div class="stat-line"><span class="stat-label">Pull-Ups</span><span id="stat-pullups" class="stat-total">0</span></div>
+                <div class="stat-line"><span class="stat-label">Miles Ran</span><span id="stat-run" class="stat-total">0</span></div>
+            </div>
+            <button class="full-reset-btn" onclick="dangerZoneReset()">HARD RESET ALL DATA</button>
+        </div>
+
+        <div id="monthly" class="tab-content"></div><div id="yearly" class="tab-content"></div>
     </div>
 
     <script>
         const exercises = ['pushups', 'situps', 'squats', 'ammocan', 'pullups', 'run'];
 
+        function checkDailyReset() {
+            const lastReset = localStorage.getItem('lastResetDate');
+            const now = new Date();
+            
+            // Current time in PST (UTC-8)
+            const pstNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+            
+            // Create a target date object for Today at 8am PST
+            let targetReset = new Date(pstNow);
+            targetReset.setHours(8, 0, 0, 0);
+
+            // If it's currently before 8am PST, the reset happened yesterday at 8am
+            if (pstNow < targetReset) {
+                targetReset.setDate(targetReset.getDate() - 1);
+            }
+
+            // If we haven't reset since the last 8am PST passed...
+            if (!lastReset || new Date(lastReset) < targetReset) {
+                // If all tasks were done before reset, increment Weekly Commission
+                if (localStorage.getItem('dailyComplete') === 'true') {
+                    let comms = parseInt(localStorage.getItem('commissions')) || 0;
+                    localStorage.setItem('commissions', Math.min(comms + 1, 5));
+                }
+
+                // Wipe daily data
+                exercises.forEach(ex => localStorage.removeItem(ex));
+                localStorage.setItem('dailyComplete', 'false');
+                localStorage.setItem('lastResetDate', pstNow.toISOString());
+            }
+        }
+
         function updateUI() {
-            let totalPoints = 0;
+            let allDone = true;
             exercises.forEach(ex => {
                 const count = parseInt(localStorage.getItem(ex)) || 0;
+                const total = parseInt(localStorage.getItem('total_' + ex)) || 0;
                 const card = document.getElementById(`card-${ex}`);
                 const goal = parseInt(card.getAttribute('data-goal'));
                 const percent = Math.min((count / goal) * 100, 100);
                 
                 card.querySelector('.count-display').innerText = `${count}/${goal}`;
                 card.querySelector('.progress-bar-fill').style.width = percent + '%';
+                document.getElementById('stat-' + ex).innerText = total;
 
                 if (count >= goal) {
                     card.querySelector('.complete-status').style.display = 'block';
                     card.querySelector('.input-group').style.display = 'none';
                     card.querySelector('.progress-bar-fill').style.background = 'var(--success)';
-                    totalPoints += 5;
                 } else {
                     card.querySelector('.complete-status').style.display = 'none';
                     card.querySelector('.input-group').style.display = 'flex';
                     card.querySelector('.progress-bar-fill').style.background = 'var(--primary)';
+                    allDone = false;
                 }
             });
-            document.getElementById('strength-val').innerText = totalPoints;
+
+            if (allDone && exercises.length > 0) {
+                localStorage.setItem('dailyComplete', 'true');
+            }
+
+            // Weekly Commissions
+            let comms = parseInt(localStorage.getItem('commissions')) || 0;
+            document.getElementById('commission-count').innerText = `${comms}/5`;
+            document.getElementById('commission-fill').style.width = (comms / 5 * 100) + '%';
         }
 
         function addReps(ex, manualVal = null) {
@@ -140,17 +191,22 @@
             const input = card.querySelector('input');
             const val = manualVal || parseInt(input.value);
             if (!isNaN(val)) {
+                // Update Daily
                 let current = parseInt(localStorage.getItem(ex)) || 0;
                 localStorage.setItem(ex, current + val);
+                // Update All-Time
+                let total = parseInt(localStorage.getItem('total_' + ex)) || 0;
+                localStorage.setItem('total_' + ex, total + val);
+                
                 updateUI();
                 if(input) input.value = '';
             }
         }
 
-        function resetGoals() {
-            if(confirm("Reset all daily progress?")) {
-                exercises.forEach(ex => localStorage.removeItem(ex));
-                updateUI();
+        function dangerZoneReset() {
+            if(confirm("CRITICAL: This will delete ALL all-time stats and commissions. Continue?")) {
+                localStorage.clear();
+                location.reload();
             }
         }
 
@@ -161,6 +217,7 @@
             element.classList.add('active');
         }
 
+        checkDailyReset();
         updateUI();
     </script>
 </body>
