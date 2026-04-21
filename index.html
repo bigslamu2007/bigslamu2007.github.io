@@ -8,16 +8,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         :root { 
-            --primary: #0A84FF; /* iOS Blue */
+            --primary: #0A84FF; 
+            --success: #32D74B;
             --bg: #000000; 
             --card: #1C1C1E; 
             --text: #FFFFFF; 
             --secondary-text: #8E8E93;
-            --tab-bg: #161617;
+            --border: #38383A;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, sans-serif; 
             background: var(--bg); 
             color: var(--text);
             margin: 0; 
@@ -26,36 +27,37 @@
             overflow: hidden; 
         }
 
-        /* Top Tab Bar */
+        /* Top Tab Bar - Distinguished Tabs */
         .nav-bar { 
             position: fixed; 
             top: 0; 
             width: 100%; 
-            height: 60px; 
-            background: var(--tab-bg); 
             display: flex; 
-            border-bottom: 0.5px solid #38383A;
+            background: #161617;
+            padding-top: env(safe-area-inset-top);
             z-index: 1000;
-            padding-top: env(safe-area-inset-top); /* Handles the iPhone Dynamic Island/Notch */
         }
 
         .nav-item { 
             flex: 1; 
+            height: 50px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             color: var(--secondary-text); 
-            font-size: 12px; 
+            font-size: 11px; 
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
+            border-right: 1px solid var(--border); /* Distinguishes tabs */
+            transition: background 0.2s;
         }
 
+        .nav-item:last-child { border-right: none; }
+
         .nav-item.active { 
-            color: var(--primary); 
-            border-bottom: 3px solid var(--primary);
-            background: rgba(10, 132, 255, 0.1);
+            color: var(--text); 
+            background: var(--card);
+            box-shadow: inset 0 -3px 0 var(--primary);
         }
 
         /* Content Layout */
@@ -66,9 +68,10 @@
             padding: 0 15px; 
         }
 
-        .tab-content { display: none; animation: fadeIn 0.2s ease-in-out; }
+        .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
         .tab-content.active { display: block; }
 
+        /* Goal Cards */
         .goal-card { 
             background: var(--card); 
             padding: 20px; 
@@ -77,15 +80,27 @@
             border: 1px solid #2C2C2E;
         }
 
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Push-Up Tracker Styling */
+        .tracker-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
+        .progress-container { display: flex; align-items: center; gap: 15px; }
+        .count-display { font-family: monospace; font-size: 18px; color: var(--primary); min-width: 70px; }
+        
+        .progress-bar-bg { flex-grow: 1; height: 8px; background: #3A3A3C; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+        
+        .input-group { margin-top: 15px; display: flex; gap: 10px; }
+        input[type="number"] { 
+            background: #2C2C2E; border: none; border-radius: 8px; color: white; 
+            padding: 10px; width: 60px; text-align: center; font-size: 16px; 
+        }
+        button { 
+            background: var(--primary); color: white; border: none; 
+            border-radius: 8px; padding: 10px 20px; font-weight: 600; flex-grow: 1;
         }
 
-        .stat-value { color: var(--primary); font-weight: bold; font-family: monospace; font-size: 18px; }
+        .complete-status { color: var(--success); font-size: 12px; font-weight: bold; display: none; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -100,46 +115,71 @@
 
     <div class="content-area">
         <div id="daily" class="tab-content active">
-            <div class="goal-card">✅ Morning Meditation</div>
+            <div class="goal-card">
+                <div class="tracker-header">
+                    <span>Do 100 Push-Ups</span>
+                    <span id="complete-msg" class="complete-status">COMPLETE ✓</span>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="count-display" id="pushup-count">0 / 100</div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-fill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div class="input-group" id="input-area">
+                    <input type="number" id="pushup-input" placeholder="+0" inputmode="numeric">
+                    <button onclick="addPushups()">Add Push-Ups</button>
+                </div>
+            </div>
+            
             <div class="goal-card">💧 2L Water Intake</div>
-            <div class="goal-card">🏋️‍♂️ Push Workout</div>
         </div>
 
-        <div id="weekly" class="tab-content">
-            <div class="goal-card">📖 Finish 1st half of "Atomic Habits"</div>
-            <div class="goal-card">🍱 Meal Prep - Sunday</div>
-        </div>
-
-        <div id="monthly" class="tab-content">
-            <div class="goal-card">📈 Review Investment Portfolio</div>
-            <div class="goal-card">🧹 Deep Clean Apartment</div>
-        </div>
-
-        <div id="yearly" class="tab-content">
-            <div class="goal-card">🌍 Travel to Tokyo</div>
-            <div class="goal-card">🎸 Learn 5 Full Songs on Guitar</div>
-        </div>
-
-        <div id="stats" class="tab-content">
-            <div class="goal-card"><div class="stat-row"><span>Strength</span> <span class="stat-value">LVL 12</span></div></div>
-            <div class="goal-card"><div class="stat-row"><span>Intelligence</span> <span class="stat-value">LVL 24</span></div></div>
-            <div class="goal-card"><div class="stat-row"><span>Charisma</span> <span class="stat-value">LVL 08</span></div></div>
-        </div>
+        <div id="weekly" class="tab-content"><div class="goal-card">Weekly Goals...</div></div>
+        <div id="monthly" class="tab-content"><div class="goal-card">Monthly Goals...</div></div>
+        <div id="yearly" class="tab-content"><div class="goal-card">Yearly Goals...</div></div>
+        <div id="stats" class="tab-content"><div class="goal-card">Stats...</div></div>
     </div>
 
     <script>
+        let totalPushups = parseInt(localStorage.getItem('pushups')) || 0;
+
+        function updateUI() {
+            const goal = 100;
+            const percentage = Math.min((totalPushups / goal) * 100, 100);
+            
+            document.getElementById('pushup-count').innerText = `${totalPushups} / ${goal}`;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+
+            if (totalPushups >= goal) {
+                document.getElementById('complete-msg').style.display = 'block';
+                document.getElementById('input-area').style.display = 'none';
+                document.getElementById('progress-fill').style.background = 'var(--success)';
+            }
+        }
+
+        function addPushups() {
+            const input = document.getElementById('pushup-input');
+            const val = parseInt(input.value);
+            if (!isNaN(val)) {
+                totalPushups += val;
+                localStorage.setItem('pushups', totalPushups);
+                updateUI();
+                input.value = '';
+            }
+        }
+
         function showTab(tabId, element) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            
-            // Show selected tab
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
-            
-            // Subtle haptic feedback feel (vibration not supported in standard web, 
-            // but we can add a visual pop if you like!)
         }
+
+        // Initialize display on load
+        updateUI();
     </script>
 </body>
 </html>
