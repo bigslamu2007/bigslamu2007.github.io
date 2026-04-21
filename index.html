@@ -8,97 +8,38 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         :root { 
-            --primary: #0A84FF; 
-            --success: #32D74B;
-            --bg: #000000; 
-            --card: #1C1C1E; 
-            --text: #FFFFFF; 
-            --secondary-text: #8E8E93;
-            --border: #38383A;
+            --primary: #0A84FF; --success: #32D74B; --bg: #000000; 
+            --card: #1C1C1E; --text: #FFFFFF; --secondary-text: #8E8E93; --border: #38383A;
         }
 
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background: var(--bg); 
-            color: var(--text);
-            margin: 0; 
-            padding: 0; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; height: 100vh; overflow: hidden; }
 
-        /* Top Tab Bar - Distinguished Tabs */
-        .nav-bar { 
-            position: fixed; 
-            top: 0; 
-            width: 100%; 
-            display: flex; 
-            background: #161617;
-            padding-top: env(safe-area-inset-top);
-            z-index: 1000;
-        }
-
-        .nav-item { 
-            flex: 1; 
-            height: 50px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: var(--secondary-text); 
-            font-size: 11px; 
-            font-weight: 600;
-            text-transform: uppercase;
-            border-right: 1px solid var(--border); /* Distinguishes tabs */
-            transition: background 0.2s;
-        }
-
+        /* Top Tab Bar */
+        .nav-bar { position: fixed; top: 0; width: 100%; display: flex; background: #161617; padding-top: env(safe-area-inset-top); z-index: 1000; }
+        .nav-item { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; color: var(--secondary-text); font-size: 10px; font-weight: 600; text-transform: uppercase; border-right: 1px solid var(--border); transition: background 0.2s; }
         .nav-item:last-child { border-right: none; }
-
-        .nav-item.active { 
-            color: var(--text); 
-            background: var(--card);
-            box-shadow: inset 0 -3px 0 var(--primary);
-        }
+        .nav-item.active { color: var(--text); background: var(--card); box-shadow: inset 0 -3px 0 var(--primary); }
 
         /* Content Layout */
-        .content-area { 
-            margin-top: calc(70px + env(safe-area-inset-top)); 
-            height: calc(100vh - 100px); 
-            overflow-y: auto; 
-            padding: 0 15px; 
-        }
-
+        .content-area { margin-top: calc(70px + env(safe-area-inset-top)); height: calc(100vh - 100px); overflow-y: auto; padding: 0 15px; padding-bottom: 50px; }
         .tab-content { display: none; animation: fadeIn 0.2s ease-out; }
         .tab-content.active { display: block; }
 
         /* Goal Cards */
-        .goal-card { 
-            background: var(--card); 
-            padding: 20px; 
-            border-radius: 14px; 
-            margin-bottom: 12px; 
-            border: 1px solid #2C2C2E;
-        }
-
-        /* Push-Up Tracker Styling */
-        .tracker-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
-        .progress-container { display: flex; align-items: center; gap: 15px; }
-        .count-display { font-family: monospace; font-size: 18px; color: var(--primary); min-width: 70px; }
+        .goal-card { background: var(--card); padding: 18px; border-radius: 14px; margin-bottom: 12px; border: 1px solid #2C2C2E; }
+        .tracker-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; font-size: 15px; }
+        .progress-container { display: flex; align-items: center; gap: 12px; }
+        .count-display { font-family: monospace; font-size: 16px; color: var(--primary); min-width: 65px; }
         
-        .progress-bar-bg { flex-grow: 1; height: 8px; background: #3A3A3C; border-radius: 4px; overflow: hidden; }
+        .progress-bar-bg { flex-grow: 1; height: 6px; background: #3A3A3C; border-radius: 3px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
         
-        .input-group { margin-top: 15px; display: flex; gap: 10px; }
-        input[type="number"] { 
-            background: #2C2C2E; border: none; border-radius: 8px; color: white; 
-            padding: 10px; width: 60px; text-align: center; font-size: 16px; 
-        }
-        button { 
-            background: var(--primary); color: white; border: none; 
-            border-radius: 8px; padding: 10px 20px; font-weight: 600; flex-grow: 1;
-        }
+        .input-group { margin-top: 12px; display: flex; gap: 8px; }
+        input[type="number"] { background: #2C2C2E; border: none; border-radius: 8px; color: white; padding: 8px; width: 50px; text-align: center; font-size: 16px; }
+        button { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: 600; flex-grow: 1; font-size: 14px; }
 
-        .complete-status { color: var(--success); font-size: 12px; font-weight: bold; display: none; }
+        .complete-status { color: var(--success); font-size: 11px; display: none; }
+        .stat-val { color: var(--primary); font-family: monospace; font-size: 20px; font-weight: bold; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -115,57 +56,90 @@
 
     <div class="content-area">
         <div id="daily" class="tab-content active">
-            <div class="goal-card">
-                <div class="tracker-header">
-                    <span>Do 100 Push-Ups</span>
-                    <span id="complete-msg" class="complete-status">COMPLETE ✓</span>
-                </div>
-                
+            <div class="goal-card" id="card-pushups">
+                <div class="tracker-header"><span>Do 100 Push-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
                 <div class="progress-container">
-                    <div class="count-display" id="pushup-count">0 / 100</div>
-                    <div class="progress-bar-bg">
-                        <div id="progress-fill" class="progress-bar-fill"></div>
-                    </div>
+                    <div class="count-display">0/100</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
                 </div>
-
-                <div class="input-group" id="input-area">
-                    <input type="number" id="pushup-input" placeholder="+0" inputmode="numeric">
-                    <button onclick="addPushups()">Add Push-Ups</button>
-                </div>
+                <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('pushups')">Add</button></div>
             </div>
-            
-            <div class="goal-card">💧 2L Water Intake</div>
+
+            <div class="goal-card" id="card-situps">
+                <div class="tracker-header"><span>Do 100 Sit-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="progress-container">
+                    <div class="count-display">0/100</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+                </div>
+                <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('situps')">Add</button></div>
+            </div>
+
+            <div class="goal-card" id="card-squats">
+                <div class="tracker-header"><span>Do 100 Squats</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="progress-container">
+                    <div class="count-display">0/100</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+                </div>
+                <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('squats')">Add</button></div>
+            </div>
+
+            <div class="goal-card" id="card-ammocan">
+                <div class="tracker-header"><span>Do 100 Ammo Can Lifts</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="progress-container">
+                    <div class="count-display">0/100</div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+                </div>
+                <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('ammocan')">Add</button></div>
+            </div>
         </div>
 
-        <div id="weekly" class="tab-content"><div class="goal-card">Weekly Goals...</div></div>
-        <div id="monthly" class="tab-content"><div class="goal-card">Monthly Goals...</div></div>
-        <div id="yearly" class="tab-content"><div class="goal-card">Yearly Goals...</div></div>
-        <div id="stats" class="tab-content"><div class="goal-card">Stats...</div></div>
+        <div id="stats" class="tab-content">
+            <div class="goal-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>STRENGTH</span>
+                    <span id="strength-val" class="stat-val">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="weekly" class="tab-content"></div>
+        <div id="monthly" class="tab-content"></div>
+        <div id="yearly" class="tab-content"></div>
     </div>
 
     <script>
-        let totalPushups = parseInt(localStorage.getItem('pushups')) || 0;
+        const exercises = ['pushups', 'situps', 'squats', 'ammocan'];
+        const goal = 100;
 
         function updateUI() {
-            const goal = 100;
-            const percentage = Math.min((totalPushups / goal) * 100, 100);
-            
-            document.getElementById('pushup-count').innerText = `${totalPushups} / ${goal}`;
-            document.getElementById('progress-fill').style.width = percentage + '%';
+            let completedCount = 0;
+            exercises.forEach(ex => {
+                const count = parseInt(localStorage.getItem(ex)) || 0;
+                const card = document.getElementById(`card-${ex}`);
+                const percent = Math.min((count / goal) * 100, 100);
+                
+                card.querySelector('.count-display').innerText = `${count}/${goal}`;
+                card.querySelector('.progress-bar-fill').style.width = percent + '%';
 
-            if (totalPushups >= goal) {
-                document.getElementById('complete-msg').style.display = 'block';
-                document.getElementById('input-area').style.display = 'none';
-                document.getElementById('progress-fill').style.background = 'var(--success)';
-            }
+                if (count >= goal) {
+                    card.querySelector('.complete-status').style.display = 'block';
+                    card.querySelector('.input-group').style.display = 'none';
+                    card.querySelector('.progress-bar-fill').style.background = 'var(--success)';
+                    completedCount++;
+                }
+            });
+            // Update Strength Stat based on completed goals
+            localStorage.setItem('strength', completedCount * 5); // 5 points per goal
+            document.getElementById('strength-val').innerText = localStorage.getItem('strength');
         }
 
-        function addPushups() {
-            const input = document.getElementById('pushup-input');
+        function addReps(ex) {
+            const card = document.getElementById(`card-${ex}`);
+            const input = card.querySelector('input');
             const val = parseInt(input.value);
             if (!isNaN(val)) {
-                totalPushups += val;
-                localStorage.setItem('pushups', totalPushups);
+                let current = parseInt(localStorage.getItem(ex)) || 0;
+                localStorage.setItem(ex, current + val);
                 updateUI();
                 input.value = '';
             }
@@ -178,7 +152,6 @@
             element.classList.add('active');
         }
 
-        // Initialize display on load
         updateUI();
     </script>
 </body>
