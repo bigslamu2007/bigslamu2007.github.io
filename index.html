@@ -41,7 +41,6 @@
         .stat-total { color: var(--text); font-family: monospace; font-weight: bold; }
 
         .full-reset-btn { background: var(--danger); margin-top: 30px; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; color: white; border: none; }
-
         .complete-status { color: var(--success); font-size: 11px; display: none; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -59,24 +58,24 @@
 
     <div class="content-area">
         <div id="daily" class="tab-content active">
-            <div class="goal-card" id="card-pushups" data-goal="100">
+            <div class="goal-card" id="card-pushups" data-goal="50">
                 <div class="tracker-header"><span>Push-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
-                <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
+                <div class="progress-container"><div class="count-display">0/50</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('pushups')">Add</button></div>
             </div>
-            <div class="goal-card" id="card-situps" data-goal="100">
+            <div class="goal-card" id="card-situps" data-goal="50">
                 <div class="tracker-header"><span>Sit-Ups</span> <span class="complete-status">COMPLETE ✓</span></div>
-                <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
+                <div class="progress-container"><div class="count-display">0/50</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('situps')">Add</button></div>
             </div>
-            <div class="goal-card" id="card-squats" data-goal="100">
+            <div class="goal-card" id="card-squats" data-goal="50">
                 <div class="tracker-header"><span>Squats</span> <span class="complete-status">COMPLETE ✓</span></div>
-                <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
+                <div class="progress-container"><div class="count-display">0/50</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('squats')">Add</button></div>
             </div>
-            <div class="goal-card" id="card-ammocan" data-goal="100">
+            <div class="goal-card" id="card-ammocan" data-goal="50">
                 <div class="tracker-header"><span>Ammo Can Lifts</span> <span class="complete-status">COMPLETE ✓</span></div>
-                <div class="progress-container"><div class="count-display">0/100</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
+                <div class="progress-container"><div class="count-display">0/50</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('ammocan')">Add</button></div>
             </div>
             <div class="goal-card" id="card-pullups" data-goal="20">
@@ -84,9 +83,9 @@
                 <div class="progress-container"><div class="count-display">0/20</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><input type="number" placeholder="+0" inputmode="numeric"><button onclick="addReps('pullups')">Add</button></div>
             </div>
-            <div class="goal-card" id="card-run" data-goal="3">
-                <div class="tracker-header"><span>Run 3 Miles</span> <span class="complete-status">COMPLETE ✓</span></div>
-                <div class="progress-container"><div class="count-display">0/3</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
+            <div class="goal-card" id="card-run" data-goal="1">
+                <div class="tracker-header"><span>Run 1 Mile</span> <span class="complete-status">COMPLETE ✓</span></div>
+                <div class="progress-container"><div class="count-display">0/1</div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div></div>
                 <div class="input-group"><button onclick="addReps('run', 1)">+1 Mile Complete</button></div>
             </div>
         </div>
@@ -123,28 +122,17 @@
         function checkDailyReset() {
             const lastReset = localStorage.getItem('lastResetDate');
             const now = new Date();
-            
-            // Current time in PST (UTC-8)
             const pstNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-            
-            // Create a target date object for Today at 8am PST
             let targetReset = new Date(pstNow);
             targetReset.setHours(8, 0, 0, 0);
 
-            // If it's currently before 8am PST, the reset happened yesterday at 8am
-            if (pstNow < targetReset) {
-                targetReset.setDate(targetReset.getDate() - 1);
-            }
+            if (pstNow < targetReset) { targetReset.setDate(targetReset.getDate() - 1); }
 
-            // If we haven't reset since the last 8am PST passed...
             if (!lastReset || new Date(lastReset) < targetReset) {
-                // If all tasks were done before reset, increment Weekly Commission
                 if (localStorage.getItem('dailyComplete') === 'true') {
                     let comms = parseInt(localStorage.getItem('commissions')) || 0;
                     localStorage.setItem('commissions', Math.min(comms + 1, 5));
                 }
-
-                // Wipe daily data
                 exercises.forEach(ex => localStorage.removeItem(ex));
                 localStorage.setItem('dailyComplete', 'false');
                 localStorage.setItem('lastResetDate', pstNow.toISOString());
@@ -176,11 +164,7 @@
                 }
             });
 
-            if (allDone && exercises.length > 0) {
-                localStorage.setItem('dailyComplete', 'true');
-            }
-
-            // Weekly Commissions
+            if (allDone && exercises.length > 0) { localStorage.setItem('dailyComplete', 'true'); }
             let comms = parseInt(localStorage.getItem('commissions')) || 0;
             document.getElementById('commission-count').innerText = `${comms}/5`;
             document.getElementById('commission-fill').style.width = (comms / 5 * 100) + '%';
@@ -191,20 +175,17 @@
             const input = card.querySelector('input');
             const val = manualVal || parseInt(input.value);
             if (!isNaN(val)) {
-                // Update Daily
                 let current = parseInt(localStorage.getItem(ex)) || 0;
                 localStorage.setItem(ex, current + val);
-                // Update All-Time
                 let total = parseInt(localStorage.getItem('total_' + ex)) || 0;
                 localStorage.setItem('total_' + ex, total + val);
-                
                 updateUI();
                 if(input) input.value = '';
             }
         }
 
         function dangerZoneReset() {
-            if(confirm("CRITICAL: This will delete ALL all-time stats and commissions. Continue?")) {
+            if(confirm("CRITICAL: Delete ALL stats and commissions?")) {
                 localStorage.clear();
                 location.reload();
             }
